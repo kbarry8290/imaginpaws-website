@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImaginPaws - AI Pet Transformations</title>
+    <meta name="description" content="Turn your pet into a human or a work of art using AI!">
+    <link rel="icon" href="/favicon.ico">
+    <link href="./dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-white text-gray-800 min-h-screen">
+    <nav class="flex items-center justify-between flex-wrap bg-white shadow-sm p-6">
+        <div class="flex items-center flex-shrink-0 mr-6">
+            <img src="./examples/logo2.png" alt="ImaginPaws Logo" class="h-2 sm:h-3 md:h-4 w-auto">
+        </div>
+        <div class="block lg:hidden">
+            <button id="mobile-menu-button" class="flex items-center px-3 py-2 border rounded text-gray-700 border-gray-300 hover:text-gray-900 hover:border-gray-400">
+                <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title><path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="w-full block flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block">
+            <div class="text-sm lg:flex-grow">
+                <a href="/index.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900 mr-4 font-semibold">
+                    Home
+                </a>
+                <a href="/privacy.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900 mr-4">
+                    Privacy Policy
+                </a>
+                <a href="/terms.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900 mr-4">
+                    Terms & Conditions
+                </a>
+                <a href="https://tiktok.com/@imaginpaws" target="_blank" rel="noopener noreferrer" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900 mr-4">
+                    TikTok
+                </a>
+                <a href="https://instagram.com/imaginpaws" target="_blank" rel="noopener noreferrer" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900">
+                    Instagram
+                </a>
+            </div>
+            <div>
+                <a href="https://apps.apple.com/" target="_blank" rel="noopener noreferrer" class="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-black bg-black hover:border-transparent hover:text-black hover:bg-white mt-4 lg:mt-0 transition-colors">Download App</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="px-4">
+        <!-- Main CTA Section -->
+        <section class="py-20 gradient-bg-white-to-gray text-center">
+            <h2 class="text-4xl sm:text-5xl font-extrabold mb-6">Transform Your Pet with AI</h2>
+            <p class="text-lg max-w-2xl mx-auto mb-10">
+                Ever wondered what your dog would look like as a human? Or your cat as a renaissance painting?
+                With ImaginPaws, turn your furry friend into amazing AI-generated artwork.
+            </p>
+            <a
+                href="https://apps.apple.com/"
+                class="inline-block bg-black text-white px-8 py-4 text-lg font-semibold rounded-full hover:opacity-90 transition-opacity"
+            >
+                Try It Now
+            </a>
+        </section>
+
+        <!-- Hero Section with Video -->
+        <section class="relative mb-16">
+            <div class="max-w-6xl mx-auto">
+                <video 
+                    class="w-full h-auto rounded-lg" 
+                    autoplay 
+                    muted 
+                    loop 
+                    playsinline
+                    controls
+                >
+                    <source src="./examples/hero.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </section>
+
+        <!-- Section Heading -->
+        <section class="text-center mb-16">
+            <h2 class="text-3xl sm:text-4xl font-bold text-black">Here's What You Can Do With ImaginPaws</h2>
+        </section>
+
+        <!-- Feature Examples -->
+        <section class="max-w-4xl mx-auto mb-16">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-12">
+                <div class="text-center">
+                    <img src="./examples/pet-to-person.avif" alt="Pet to Person" class="w-full max-w-xs mx-auto h-auto mb-4">
+                    <h3 class="text-xl font-bold mb-3">Pet to Person.</h3>
+                    <p class="text-gray-700 leading-relaxed">See your furry friend as a playful human. Fun, surprising, and totally shareable before/after results!</p>
+                </div>
+                <div class="text-center">
+                    <img src="./examples/pet-portrait.avif" alt="Pet Portrait" class="w-full max-w-xs mx-auto h-auto mb-4">
+                    <h3 class="text-xl font-bold mb-3">Pet Portraits.</h3>
+                    <p class="text-gray-700 leading-relaxed">Transform your pet's photo into vibrant, stylized artwork. Choose colors and styles for a personal touch.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="text-center py-16 bg-gray-50">
+            <h3 class="text-3xl font-bold mb-6">Ready to Transform Your Pet?</h3>
+            <a
+                href="https://apps.apple.com/"
+                class="inline-block bg-black text-white px-8 py-4 text-lg font-semibold rounded-full hover:opacity-90 transition-opacity"
+            >
+                Download ImaginPaws Now
+            </a>
+        </section>
+    </main>
+
+    <footer class="text-center text-sm text-gray-500 py-8">
+        &copy; <span id="current-year"></span> ImaginPaws. All rights reserved.
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

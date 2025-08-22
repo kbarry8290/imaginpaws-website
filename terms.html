@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions - ImaginPaws</title>
+    <meta name="description" content="Terms and conditions for using the ImaginPaws app">
+    <link rel="icon" href="/favicon.ico">
+    <link href="./dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-white text-gray-800 min-h-screen">
+    <nav class="flex items-center justify-between flex-wrap bg-white shadow-sm p-6">
+        <div class="flex items-center flex-shrink-0 mr-6">
+            <a href="/index.html">
+                <img src="./examples/logo2.png" alt="ImaginPaws Logo" class="h-2 sm:h-3 md:h-4 w-auto">
+            </a>
+        </div>
+        <div class="block lg:hidden">
+            <button id="mobile-menu-button" class="flex items-center px-3 py-2 border rounded text-gray-700 border-gray-300 hover:text-gray-900 hover:border-gray-400">
+                <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title><path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="w-full block flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block">
+            <div class="text-sm lg:flex-grow">
+                <a href="/index.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900 mr-4">
+                    Home
+                </a>
+                <a href="/privacy.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900 mr-4">
+                    Privacy Policy
+                </a>
+                <a href="/terms.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900 mr-4 font-semibold">
+                    Terms & Conditions
+                </a>
+                <a href="https://tiktok.com/@imaginpaws" target="_blank" rel="noopener noreferrer" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900 mr-4">
+                    TikTok
+                </a>
+                <a href="https://instagram.com/imaginpaws" target="_blank" rel="noopener noreferrer" class="block mt-4 lg:inline-block lg:mt-0 text-gray-700 hover:text-gray-900">
+                    Instagram
+                </a>
+            </div>
+            <div>
+                <a href="https://apps.apple.com/" target="_blank" rel="noopener noreferrer" class="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-black bg-black hover:border-transparent hover:text-black hover:bg-white mt-4 lg:mt-0 transition-colors">Download App</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 py-12">
+        <div class="prose prose-lg max-w-none">
+            <h1 class="text-4xl font-bold mb-8">Terms & Conditions</h1>
+            
+            <p class="text-gray-600 mb-8"><strong>Effective Date:</strong> August 1st, 2025</p>
+            
+            <p class="mb-8">These Terms govern your use of the ImaginPaws app ("App").</p>
+
+            <div class="space-y-8">
+                <section>
+                    <h2 class="text-2xl font-semibold mb-4">1. Use of the App</h2>
+                    <p>By using the App, you agree to follow these terms. You must be at least 13 years old.</p>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-semibold mb-4">2. User Content</h2>
+                    <p>You retain ownership of the pet photos you upload. By submitting them, you grant us the right to process them with our AI tools and store them for your access.</p>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-semibold mb-4">3. Paid Features</h2>
+                    <p>Some features require in-app purchases. All purchases are processed by Apple. We do not offer refunds outside of Apple's policies.</p>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-semibold mb-4">4. Prohibited Use</h2>
+                    <p>You may not:</p>
+                    <ul class="list-disc pl-6 mt-2 space-y-1">
+                        <li>Upload offensive or illegal content</li>
+                        <li>Attempt to reverse-engineer the app</li>
+                        <li>Use the app to infringe on others' rights</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-semibold mb-4">5. Disclaimer</h2>
+                    <p>We provide the app "as is." We don't guarantee perfect accuracy or uptime. AI-generated content is for entertainment purposes.</p>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-semibold mb-4">6. Termination</h2>
+                    <p>We may suspend your access if you violate these terms.</p>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-semibold mb-4">7. Contact</h2>
+                    <p>Questions? Email <a href="mailto:support@imaginpaws.com" class="text-blue-600 hover:text-blue-800 underline">support@imaginpaws.com</a></p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center text-sm text-gray-500 py-8 border-t">
+        &copy; <span id="current-year"></span> ImaginPaws. All rights reserved.
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

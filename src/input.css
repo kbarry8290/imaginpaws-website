@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer utilities {
+  .gradient-bg-white-to-gray {
+    background: linear-gradient(to bottom, #ffffff 0%, #f3f4f6 100%);
+  }
+  .gradient-bg-gray-to-white {
+    background: linear-gradient(to bottom, #f3f4f6 0%, #ffffff 100%);
+  }
+}
