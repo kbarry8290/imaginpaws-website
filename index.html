@@ -112,7 +112,47 @@
         &copy; <span id="current-year"></span> ImaginPaws. All rights reserved.
     </footer>
 
+    <!-- Supabase Configuration for main site (non-auth purposes only) -->
     <script>
+        // Supabase config for main site - implicit flow, no session detection
+        window.SUPABASE_CONFIG = {
+            url: 'https://njfqprtaznrhvuydsayo.supabase.co',
+            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qZnFwcnRhem5yaHZ1eWRzYXlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2MDc1NjQsImV4cCI6MjA2MTE4MzU2NH0.PYKzo-2lj1rZOUsttjyf67HnQvL1z7XCzMA6mK52L08'
+        };
+        
+        // Initialize Supabase client for main site with implicit flow and no session detection
+        // This prevents any automatic session handling that could interfere with reset password flow
+        import('https://esm.run/@supabase/supabase-js@^2').then(({ createClient }) => {
+            window.supabase = createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey, {
+                auth: {
+                    flowType: 'implicit',
+                    detectSessionInUrl: false,
+                    persistSession: false,  // Don't persist sessions on main site
+                    autoRefreshToken: false, // Don't auto-refresh on main site
+                },
+            });
+            console.log('Main site Supabase client initialized with implicit flow, no session detection');
+        });
+    </script>
+    
+    <script>
+        // Early script to handle Supabase recovery links
+        (function() {
+            const url = new URL(window.location.href);
+            const code = url.searchParams.get('code');
+            const type = url.searchParams.get('type');
+            
+            // If this is a recovery link with a code, redirect to reset password page
+            if (code && type === 'recovery') {
+                console.log('Forwarding recovery link to reset password page');
+                const resetUrl = new URL('/auth/reset-password', window.location.origin);
+                resetUrl.searchParams.set('code', code);
+                resetUrl.searchParams.set('type', type);
+                window.location.href = resetUrl.toString();
+                return;
+            }
+        })();
+        
         // Set current year in footer
         document.getElementById('current-year').textContent = new Date().getFullYear();
         

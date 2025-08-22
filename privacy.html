@@ -96,6 +96,23 @@
     </footer>
 
     <script>
+        // Early script to handle Supabase recovery links
+        (function() {
+            const url = new URL(window.location.href);
+            const code = url.searchParams.get('code');
+            const type = url.searchParams.get('type');
+            
+            // If this is a recovery link with a code, redirect to reset password page
+            if (code && type === 'recovery') {
+                console.log('Forwarding recovery link to reset password page');
+                const resetUrl = new URL('/auth/reset-password', window.location.origin);
+                resetUrl.searchParams.set('code', code);
+                resetUrl.searchParams.set('type', type);
+                window.location.href = resetUrl.toString();
+                return;
+            }
+        })();
+        
         // Set current year in footer
         document.getElementById('current-year').textContent = new Date().getFullYear();
         
