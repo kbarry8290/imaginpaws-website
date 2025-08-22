@@ -11,11 +11,10 @@ console.log('Supabase Config:', SUPABASE_CONFIG);
 // IMPORTANT: use implicit flow for recovery links
 const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
   auth: {
-    flowType: 'implicit',         // switch from 'pkce' to 'implicit'
-    detectSessionInUrl: false,    // we'll parse and set session manually
+    flowType: 'implicit',        // ✅ force implicit
+    detectSessionInUrl: false,   // ✅ don't auto-run PKCE
     persistSession: true,
     autoRefreshToken: true,
-    debug: true,                  // enable debug logging
   },
 });
 
@@ -53,51 +52,105 @@ const elements = {
     }
 };
 
-// Initialize the application
+// Helper functions for bootstrap
+function renderLoading() {
+    setLoading(true);
+    trackEvent('password_reset_page_viewed');
+}
+
+function renderInvalidLink() {
+    setLoading(false);
+    showInvalidState();
+}
+
+function renderPasswordForm(onSubmit) {
+    setLoading(false);
+    showSetPasswordState();
+    
+    // Set up form submission handler
+    const form = document.getElementById('set-password-form');
+    const originalSubmit = form.onsubmit;
+    
+    form.onsubmit = async (event) => {
+        event.preventDefault();
+        
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        
+        // Validate password
+        const validation = validatePassword(newPassword, confirmPassword);
+        if (!validation.isValid) {
+            showFormError(validation.error);
+            return;
+        }
+        
+        // Clear previous errors
+        showFormError('');
+        
+        // Show loading state
+        setFormLoading('submit', true);
+        
+        try {
+            await onSubmit(newPassword);
+        } catch (error) {
+            showFormError(error.message || 'Failed to update password');
+        } finally {
+            setFormLoading('submit', false);
+        }
+    };
+}
+
+function showFormError(message) {
+    const errorElement = document.getElementById('password-error');
+    if (message) {
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+    } else {
+        errorElement.classList.add('hidden');
+    }
+}
+
+function renderSuccess() {
+    showSuccessState();
+    trackEvent('password_reset_success');
+}
+
+// Bootstrap logic (handle hash first, then code)
 async function bootstrap() {
+    renderLoading();
+
+    const url = new URL(location.href);
+    const query = url.searchParams;
+    const hash = new URLSearchParams(location.hash.slice(1));
+
     try {
-        trackEvent('password_reset_page_viewed');
-        setLoading(true);
-        
-        console.log('Bootstrap: Starting password reset flow');
-        console.log('Bootstrap: Current URL:', location.href);
-        
-        const url = new URL(location.href);
-        const query = url.searchParams;
-        const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
-
-        console.log('Bootstrap: Hash params:', Object.fromEntries(hash.entries()));
-        console.log('Bootstrap: Query params:', Object.fromEntries(query.entries()));
-
-        // Prefer hash tokens first
         if (hash.get('access_token') && hash.get('refresh_token')) {
-            console.log('Bootstrap: Found hash tokens, setting session');
+            // Preferred: direct tokens
             await supabase.auth.setSession({
                 access_token: hash.get('access_token'),
                 refresh_token: hash.get('refresh_token'),
             });
         } else if (query.get('code')) {
-            console.log('Bootstrap: Found code, exchanging for session');
-            // Works in implicit too; SDK won't require a PKCE verifier
+            // Only attempt if implicit flow is enabled (no PKCE)
             await supabase.auth.exchangeCodeForSession(query.get('code'));
         } else {
-            console.log('Bootstrap: No valid tokens found, showing invalid state');
-            setLoading(false);
-            return showInvalidState(); // offer resend
+            return renderInvalidLink();
         }
 
-        console.log('Bootstrap: Session established, scrubbing URL');
-        // Scrub tokens/params from the URL
+        // Scrub tokens/params
         history.replaceState({}, document.title, '/auth/reset-password');
-        
-        // Verify user and show password form
-        await handleSuccessfulRecovery();
-    } catch (error) {
-        console.error('Bootstrap error:', error);
-        setLoading(false);
-        return showInvalidState();
-    } finally {
-        setLoading(false);
+
+        // Now it's safe to check user and render form
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data?.user) return renderInvalidLink();
+
+        renderPasswordForm(async (newPassword) => {
+            const { error: upErr } = await supabase.auth.updateUser({ password: newPassword });
+            if (upErr) return showFormError(upErr.message);
+            renderSuccess();
+        });
+    } catch (err) {
+        renderInvalidLink();
     }
 }
 
