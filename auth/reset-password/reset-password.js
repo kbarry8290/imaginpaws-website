@@ -5,7 +5,16 @@ import { trackEvent } from './mixpanel.js';
 
 // Get Supabase configuration from inline script
 const SUPABASE_CONFIG = window.SUPABASE_CONFIG || {};
-const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+// IMPORTANT: use implicit flow for recovery links
+const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
+  auth: {
+    flowType: 'implicit',         // switch from 'pkce' to 'implicit'
+    detectSessionInUrl: false,    // we'll parse and set session manually
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+});
 
 // State management
 let currentState = 'loading';
@@ -40,91 +49,46 @@ const elements = {
 };
 
 // Initialize the application
-async function init() {
+async function bootstrap() {
     try {
         trackEvent('password_reset_page_viewed');
-        
-        // Parse URL parameters
-        const params = parseUrlParams();
-        
-        // Prefer code-based recovery when available
-        if (params.code) {
-            await handleCodeRecovery(params.code);
-        } else if (params.access_token && params.refresh_token) {
-            // Fallback to token-based recovery
-            await handleTokenRecovery(params.access_token, params.refresh_token);
-        } else {
-            // No valid recovery parameters found
-            showInvalidState();
-        }
-    } catch (error) {
-        console.error('Initialization error:', error);
-        showInvalidState();
-    }
-}
-
-// Handle code-based password recovery
-async function handleCodeRecovery(code) {
-    try {
         setLoading(true);
         
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-        
-        if (error) {
-            console.error('Code exchange error:', error);
-            throw new Error('Unable to verify your reset link. Please try again or request a new one.');
-        }
-        
-        if (data.session) {
-            // Successfully established session
-            await handleSuccessfulRecovery(data.session);
+        const url = new URL(location.href);
+        const query = url.searchParams;
+        const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
+
+        // Prefer hash tokens first
+        if (hash.get('access_token') && hash.get('refresh_token')) {
+            await supabase.auth.setSession({
+                access_token: hash.get('access_token'),
+                refresh_token: hash.get('refresh_token'),
+            });
+        } else if (query.get('code')) {
+            // Works in implicit too; SDK won't require a PKCE verifier
+            await supabase.auth.exchangeCodeForSession(query.get('code'));
         } else {
-            throw new Error('Unable to establish a secure session. Please try again.');
+            setLoading(false);
+            return showInvalidState(); // offer resend
         }
+
+        // Scrub tokens/params from the URL
+        history.replaceState({}, document.title, '/auth/reset-password');
+        
+        // Verify user and show password form
+        await handleSuccessfulRecovery();
     } catch (error) {
-        console.error('Code recovery failed:', error);
-        showInvalidState();
+        console.error('Bootstrap error:', error);
+        setLoading(false);
+        return showInvalidState();
     } finally {
         setLoading(false);
     }
 }
 
-// Handle token-based password recovery
-async function handleTokenRecovery(accessToken, refreshToken) {
+// Handle successful recovery - verify user and show password form
+async function handleSuccessfulRecovery() {
     try {
-        setLoading(true);
-        
-        const { data, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken
-        });
-        
-        if (error) {
-            console.error('Token recovery error:', error);
-            throw new Error('Unable to verify your reset link. Please try again or request a new one.');
-        }
-        
-        if (data.session) {
-            // Successfully established session
-            await handleSuccessfulRecovery(data.session);
-        } else {
-            throw new Error('Unable to establish a secure session. Please try again.');
-        }
-    } catch (error) {
-        console.error('Token recovery failed:', error);
-        showInvalidState();
-    } finally {
-        setLoading(false);
-    }
-}
-
-// Handle successful recovery - clean URL and show password form
-async function handleSuccessfulRecovery(session) {
-    try {
-        // Clean the URL to remove sensitive tokens
-        const cleanUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-        
         // Verify the user exists and can update password
         const { data: { user }, error } = await supabase.auth.getUser();
         
@@ -349,9 +313,9 @@ function setupEventListeners() {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         setupEventListeners();
-        init();
+        bootstrap();
     });
 } else {
     setupEventListeners();
-    init();
+    bootstrap();
 }
