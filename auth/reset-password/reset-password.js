@@ -6,6 +6,8 @@ import { trackEvent } from './mixpanel.js';
 // Get Supabase configuration from inline script
 const SUPABASE_CONFIG = window.SUPABASE_CONFIG || {};
 
+console.log('Supabase Config:', SUPABASE_CONFIG);
+
 // IMPORTANT: use implicit flow for recovery links
 const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
   auth: {
@@ -13,8 +15,11 @@ const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
     detectSessionInUrl: false,    // we'll parse and set session manually
     persistSession: true,
     autoRefreshToken: true,
+    debug: true,                  // enable debug logging
   },
 });
+
+console.log('Supabase client created with implicit flow');
 
 // State management
 let currentState = 'loading';
@@ -54,24 +59,34 @@ async function bootstrap() {
         trackEvent('password_reset_page_viewed');
         setLoading(true);
         
+        console.log('Bootstrap: Starting password reset flow');
+        console.log('Bootstrap: Current URL:', location.href);
+        
         const url = new URL(location.href);
         const query = url.searchParams;
         const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
 
+        console.log('Bootstrap: Hash params:', Object.fromEntries(hash.entries()));
+        console.log('Bootstrap: Query params:', Object.fromEntries(query.entries()));
+
         // Prefer hash tokens first
         if (hash.get('access_token') && hash.get('refresh_token')) {
+            console.log('Bootstrap: Found hash tokens, setting session');
             await supabase.auth.setSession({
                 access_token: hash.get('access_token'),
                 refresh_token: hash.get('refresh_token'),
             });
         } else if (query.get('code')) {
+            console.log('Bootstrap: Found code, exchanging for session');
             // Works in implicit too; SDK won't require a PKCE verifier
             await supabase.auth.exchangeCodeForSession(query.get('code'));
         } else {
+            console.log('Bootstrap: No valid tokens found, showing invalid state');
             setLoading(false);
             return showInvalidState(); // offer resend
         }
 
+        console.log('Bootstrap: Session established, scrubbing URL');
         // Scrub tokens/params from the URL
         history.replaceState({}, document.title, '/auth/reset-password');
         
